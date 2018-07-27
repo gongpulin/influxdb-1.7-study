@@ -13,6 +13,10 @@ import (
 // basically defines the maximum number of partitions you can have in the ring.
 // If a smaller number of partitions are chosen when creating a ring, then
 // they're evenly spread across this many partitions in the ring.
+// 分区是我们在环的连续体中使用的分区数。 它
+// 基本上定义了环中可以拥有的最大分区数。
+// 如果在创建环时选择了较少数量的分区，那么
+// 它们均匀地分布在环中的这么多分区上。
 const partitions = 16
 
 // ring is a structure that maps series keys to entries.
@@ -30,7 +34,21 @@ const partitions = 16
 //
 // To determine the partition that a series key should be added to, the series
 // key is hashed and the first 8 bits are used as an index to the ring.
-//
+// ring是将系列键映射到条目的结构。
+
+// ring实现为粗糙的哈希环，你可以拥有它
+// 环中可变数量的成员，以及适当的成员
+// 给定的系列键始终可以找到。 与真正的哈希环不同
+// 虽然，这个ring不可调整 - 最多只有256个成员
+// ring，成员数量必须始终为2的幂。
+
+// 环的工作原理如下：环的每个成员都包含一个store
+// 包含条目的系列键的映射。 一个环总是有256个分区，
+// 并且成员占用一个或多个这些分区（取决于多少个
+// 成员被指定在环中）
+
+// 要确定系列键应添加到的分区，系列
+// key经过哈希处理，前8位用作环的索引。
 type ring struct {
 	// Number of keys within the ring. This is used to provide a hint for
 	// allocating the return values in keys(). It will not be perfectly accurate

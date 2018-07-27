@@ -1261,17 +1261,17 @@ func (e *Engine) WritePoints(points []models.Point) error {
 
 	for _, p := range points {
 		keyBuf = append(keyBuf[:0], p.Key()...)
-		keyBuf = append(keyBuf, keyFieldSeparator...)
+		keyBuf = append(keyBuf, keyFieldSeparator...)  // 这里的 keyBuf 是 seriesKey + 分隔符
 		baseLen = len(keyBuf)
 		iter := p.FieldIterator()
 		t := p.Time().UnixNano()
-		for iter.Next() {
+		for iter.Next() {      //多个filedName ，依次遍历形成多条数据
 			// Skip fields name "time", they are illegal
 			if bytes.Equal(iter.FieldKey(), timeBytes) {
 				continue
 			}
 
-			keyBuf = append(keyBuf[:baseLen], iter.FieldKey()...)
+			keyBuf = append(keyBuf[:baseLen], iter.FieldKey()...)    // 这里的 keyBuf 是 seriesKey + 分隔符 + filedName
 
 			if e.seriesTypeMap != nil {
 				// Fast-path check to see if the field for the series already exists.
@@ -1342,7 +1342,7 @@ func (e *Engine) WritePoints(points []models.Point) error {
 	defer e.mu.RUnlock()
 
 	// first try to write to the cache
-	if err := e.Cache.WriteMulti(values); err != nil {
+	if err := e.Cache.WriteMulti(values); err != nil {  // 向 cache 中写入 value 数据，如果超过了内存阀值上限，返回错误
 		return err
 	}
 

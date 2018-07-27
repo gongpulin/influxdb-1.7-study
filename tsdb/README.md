@@ -2,13 +2,13 @@
 
 The line protocol is a text based format for writing points to InfluxDB.  Each line defines a single point. 
 Multiple lines must be separated by the newline character `\n`. The format of the line consists of three parts:
-
+行协议是一种基于文本的格式，用于将点写入InfluxDB。 每行定义一个点。
+多行必须用换行符'\ n`分隔。 该行的格式由三部分组成：
 ```
 [key] [fields] [timestamp]
 ```
-
 Each section is separated by spaces.  The minimum required point consists of a measurement name and at least one field. Points without a specified timestamp will be written using the server's local timestamp. Timestamps are assumed to be in nanoseconds unless a `precision` value is passed in the query string.
-
+每个部分用空格分隔。 最低要求点包括测量名称和至少一个字段。 没有指定时间戳的点将使用服务器的本地时间戳写入。 除非在查询字符串中传递`precision`值，否则假定时间戳以纳秒为单位。
 ## Key
 
 The key is the measurement name and any optional tags separated by commas.  Measurement names, tag keys, and tag values must escape any spaces or commas using a backslash (`\`). For example: `\ ` and `\,`.  All tag values are stored as strings and should not be surrounded in quotes. 

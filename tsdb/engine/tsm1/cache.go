@@ -176,17 +176,19 @@ type storer interface {
 	count() int                                     // Count returns the number of keys in the store
 }
 
+
+//cache 中的数据并不是无限增长的，有一个 maxSize 参数用于控制当 cache 中的数据占用多少内存后就会将数据写入 tsm 文件。如果不配置的话，默认上限为 25MB，每当 cache 中的数据达到阀值后，会将当前的 cache 进行一次快照，之后清空当前 cache 中的内容，再创建一个新的 wal 文件用于写入，剩下的 wal 文件最后会被删除，快照中的数据会经过排序写入一个新的 tsm 文件中。
 // Cache maintains an in-memory store of Values for a set of keys.
 type Cache struct {
 	// Due to a bug in atomic  size needs to be the first word in the struct, as
 	// that's the only place where you're guaranteed to be 64-bit aligned on a
 	// 32 bit system. See: https://golang.org/pkg/sync/atomic/#pkg-note-BUG
-	size         uint64
-	snapshotSize uint64
+	size         uint64   //当前使用内存大小
+	snapshotSize uint64   
 
 	mu      sync.RWMutex
 	store   storer
-	maxSize uint64
+	maxSize uint64        //缓存最大值
 
 	// snapshots are the cache objects that are currently being written to tsm files
 	// they're kept in memory while flushing so they can be queried along with the cache.

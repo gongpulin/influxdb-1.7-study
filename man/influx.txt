@@ -95,3 +95,104 @@ NO_PROXY <comma-separated list of hosts>::
   List of host names that shouldn't go through any proxy. If set to an asterisk \'*' only, it matches all hosts.
 
 include::footer.txt[]
+
+
+
+
+流入（1）
+=========
+
+名称
+----
+influx - InfluxDB客户端
+
+概要
+--------
+[verse]
+'influx' [options]
+'influx' -execute <command> [options]
+'influx' -import -path <path> (-compressed) [options]
+'influx' -version
+
+描述
+-----------
+'Influx'是用于与InfluxDB服务器交互的命令行程序。
+
+在第一种形式中，程序启动一个CLI，可用于写入数据或查询数据库。命令行在* COMMAND LINE *中描述。
+
+在第二种形式中，这将执行单个命令，通常是查询。这相当于启动命令行，运行一个命令，然后退出。
+
+在第三种形式中，这会将先前导出的数据库导入数据库。
+
+第四种形式输出命令行的版本，然后立即退出。
+
+OPTIONS
+-------
+-host <host> ::
+  主机连接到。默认为localhost。
+
+-port <port> ::
+  连接到主机时使用的端口。默认值为8086。
+
+-database <database> ::
+  连接数据库时使用的数据库。
+
+-username <username> ::
+  用于连接服务器的用户名。
+
+-password <密码> ::
+  用于连接服务器的密码。如果留空，则会提示输入密码。
+
+-ssl：
+  使用https进行请求。
+
+-unsafeSsl ::
+  使用'-ssl'设置此项以允许不安全的连接。
+
+-execute <command> ::
+  执行命令并退出。
+
+-format <json | csv | column> ::
+  设置服务器响应的格式。默认为列。
+
+-precision <rfc3339 | h | m | s | ms | u | ns> ::
+  指定时间戳的格式。默认值为ns。
+
+-consistency <any | one | quorum | all> ::
+  设置写入一致性级别。默认值为1。
+
+-pretty:
+  打开JSON格式的漂亮打印格式。
+
+-node <n> ::
+  指定应查询数据的数据节点。此选项仅在企业群集上有效。
+
+-import：
+  从文件导入以前的数据库导出。如果指定，还必须指定'-path <path>'。
+
+-path <path> ::
+  要导入的数据库导出文件的路径。必须与'-import'一起使用。
+
+-pps <n>：
+  导入允许的每秒多少点。默认情况下，它为零，不会限制导入。
+
+-compressed ::
+  设置是否压缩导入文件。必须与'-import'一起使用。
+
+-version：
+  输出涌入客户端的版本。
+
+环境
+-----------
+环境变量可以小写或大写形式指定。大写版本具有优先权。
+
+HTTP_PROXY [protocol：//] <host> [：port] ::
+  设置用于HTTP的代理服务器。
+
+HTTPS_PROXY [protocol：//] <host> [：port] ::
+  设置用于HTTPS的代理服务器。对于HTTPS，优先于HTTP_PROXY。
+
+NO_PROXY <以逗号分隔的主机列表> ::
+  不应通过任何代理的主机名列表。如果仅设置为星号\'*'，则它匹配所有主机。
+
+包括:: footer.txt []

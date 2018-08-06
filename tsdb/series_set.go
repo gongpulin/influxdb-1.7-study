@@ -9,6 +9,7 @@ import (
 )
 
 // SeriesIDSet represents a lockable bitmap of series ids.
+//SeriesIDSet表示系列ID的可锁定位图。
 type SeriesIDSet struct {
 	sync.RWMutex
 	bitmap *roaring.Bitmap

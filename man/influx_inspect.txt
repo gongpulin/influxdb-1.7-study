@@ -102,3 +102,113 @@ VERIFY-SERIESFILE OPTIONS
   Number of concurrent workers to run. Defaults to the number of cores on the machine. Optional.
 
 include:footer.txt[]
+
+
+
+influx_inspect（1）
+=================
+
+名称
+----
+Influx_inspect - 显示有关InfluxDB数据文件的详细信息
+
+SYNPOSIS
+--------
+[诗]
+'Influx_inspect dumptsm'[选项]
+'Influx_inspect export'[选项]
+'Influx_inspect report'[选项]
+'Influx_inspect verify'[选项]
+'Influx_inspect verify-seriesfile'[options]
+
+描述
+-----------
+通过以下方法之一显示有关InfluxDB数据文件的详细信息
+以下命令。
+
+* dumptsm * ::
+  转储有关tsm1文件的低级详细信息。
+
+*export*：：
+  将TSM文件导出为InfluxDB线路协议格式。
+
+*report*：：
+  显示分片级别报告。
+
+*verify*：：
+  验证TSM文件的完整性。
+
+DUMPTSM选项
+---------------
+-all：：
+  转储所有数据。注意：这可能会打印很多信息。
+
+-blocks ::
+  转储原始块数据。
+
+-filter-key <string> ::
+  仅显示与此键子字符串匹配的索引和块数据。
+
+-index：
+  转储原始索引数据。
+
+EXPORT 选项
+--------------
+-compress：
+  压缩输出。
+
+-db <name> ::
+  要导出的数据库。可选的。
+
+-rp <name> ::
+  要导出的保留策略。可选的。需要指定'-db <name>'选项。
+
+-data-dir <path> ::
+  数据存储路径。默认为'〜/ .influxdb / data'。
+
+-wal-dir <path> ::
+  沃尔存储路径。默认为'〜/ .influxdb / wal'。
+
+-start <timestamp> ::
+  出口的开始时间。时间戳采用RFC3339格式。可选的。
+
+-end <timestamp> ::
+  出口的结束时间。时间戳采用RFC3339格式。可选的。
+
+-out <path> ::
+  要将导出的数据写入的目标文件。默认为'〜/ .influxdb / export'。
+
+
+
+report 选项
+--------------
+-detailed：
+  报告详细的基数估计值。
+
+-pattern <string> ::
+  仅包含与模式匹配的文件。
+
+
+
+
+验证选项
+--------------
+-dir <path> ::
+  根存储路径。默认为'〜/ .influxdb'。
+
+验证系列文件选项
+-------------------------
+-dir <path> ::
+  根数据存储路径。默认为'〜/ .influxdb / data'。
+
+-db <name> ::
+  要检查的特定数据库。可选的。
+
+-file <path> ::
+  要检查的特定系列文件的路径。覆盖'-dir'和'-db'。可选的。
+
+-v ::
+  详细输出。可选的。
+
+-c <金额> ::
+  要运行的并发工作器数。默认为计算机上的核心数。可选的。

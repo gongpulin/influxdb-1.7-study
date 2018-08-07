@@ -30,15 +30,17 @@ const (
 
 // Service manages the listener for the snapshot endpoint.
 type Service struct {
-	wg sync.WaitGroup
+	wg sync.WaitGroup //使用锁机制进行数据同步,服务收到连接请求后，首先计数器加1，然后在独立的goroutine中处理该连接，处理完成时计数器减1；调用Close接口时，wg进行阻塞操作，保证服务关闭时所有任务都完成。
 
-	Node *influxdb.Node
+	Node *influxdb.Node  //InfluxDB节点信息，集群相关功能。
 
-	MetaClient interface {
+    //Meta服务客户端接口，获取Meta的信息，用于备份Meta文件、数据库信息、数据库存储策略。
+	MetaClient interface { 
 		encoding.BinaryMarshaler
 		Database(name string) *meta.DatabaseInfo
 	}
 
+    //InfluxDB存储引擎指针，用于备份数据库的TSM shard文件
 	TSDBStore interface {
 		BackupShard(id uint64, since time.Time, w io.Writer) error
 		ExportShard(id uint64, ExportStart time.Time, ExportEnd time.Time, w io.Writer) error
@@ -49,7 +51,7 @@ type Service struct {
 		CreateShard(database, retentionPolicy string, shardID uint64, enabled bool) error
 	}
 
-	Listener net.Listener
+	Listener net.Listener  //socket对象，用于监听服务端口、接收客户端放来的请求。
 	Logger   *zap.Logger
 }
 
@@ -444,14 +446,24 @@ const (
 
 // Request represents a request for a specific backup or for information
 // about the shards on this server for a database or retention policy.
+//Request表示对特定备份的请求或有关数据库或保留策略的此服务器上的分片的信息。
 type Request struct {
-	Type                   RequestType
+	Type                   RequestType  //用于区别数据备份的类型。
+
+	//Meta文件备份、数据库信息备份、存储策略备份时使用，用于指定需要备份的数据库名称。
 	BackupDatabase         string
+
 	RestoreDatabase        string
+
+	//存储策略备份时使用，用于指定需要备份的数据库存储策略的名称。 
 	BackupRetentionPolicy  string
 	RestoreRetentionPolicy string
+
+	//TSM碎片文件备份时使用，用于指定shardID。
 	ShardID                uint64
-	Since                  time.Time
+
+	//TSM shard文件备份时使用，用于指定起始时间。
+	Since                  time.Time  
 	ExportStart            time.Time
 	ExportEnd              time.Time
 	UploadSize             int64
@@ -459,6 +471,7 @@ type Request struct {
 
 // Response contains the relative paths for all the shards on this server
 // that are in the requested database or retention policy.
+//响应包含此服务器上所请求的数据库或保留策略中所有分片的相对路径。
 type Response struct {
 	Paths []string
 }

@@ -49,3 +49,53 @@ SEE ALSO
 *influxd-restore*(1)
 
 include::footer.txt[]
+
+
+
+
+
+influxd备份（1）
+=================
+
+名称
+----
+Influxd-backup - 创建指定的InfluxDB OSS数据库的备份副本并保存到磁盘。使用这个更新的`-portable`选项
+  除非需要传统支持。有关备份和还原的完整文档，包括已弃用的文档
+  遗留格式，请参阅：
+    https://docs.influxdata.com/influxdb/latest/administration/backup_and_restore/
+
+
+概要
+--------
+'influxd backup'[选项]路径
+
+描述
+-----------
+创建指定的InfluxDB OSS数据库的备份副本，并将文件保存在兼容Enterprise的文件中
+format to PATH（保存备份的目录）。
+
+OPTIONS
+-------
+- 便携式::
+  需要以便携式格式生成备份文件，可以将其还原到InfluxDB OSS或InfluxDB Enterprise。除非需要旧版备份，否则请使用。
+
+-host <host：port> ::
+  InfluxDB OSS主机备份。可选的。默认为127.0.0.1:8088。
+
+-db <db_name> ::
+  InfluxDB OSS数据库名称备份。可选的。如果未指定，则在使用“-portable”时将备份所有数据库。
+
+-rp <rp_name> ::
+  用于备份的保留策略。可选的。如果未指定，则默认使用所有保留策略。
+
+-shard <shard_id> ::
+  要备份的分片的标识符。可选的。如果指定，则需要'-rp <rp_name>'。
+
+-start <timestamp> ::
+  包括以指定时间戳（RFC3339格式）开头的所有点。与'-since <timestamp>'不兼容。
+
+-end <timestamp> ::
+  排除时间戳后的所有点（RFC3339格式）。与'-since <timestamp>'不兼容。
+
+-since <timestamp> ::
+  在时间戳（RFC3339格式）之后创建所有点的增量备份。可选的。建议使用'-start <timestamp>'代替。

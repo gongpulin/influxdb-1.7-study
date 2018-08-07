@@ -38,3 +38,42 @@ SEE ALSO
 *influxd-backup*(1), *influxd-config*(1), *influxd-restore*(1), *influxd-run*(1), *influxd-version*(1)
 
 include::footer.txt[]
+
+
+
+
+
+influxd（1）
+==========
+
+名称
+----
+influxd - InfluxDB服务器守护进程
+
+概要
+--------
+[诗]
+'influxd'[命令] [选项]
+
+描述
+-----------
+'Influxd'是InfluxDB的服务器守护进程。
+
+COMMANDS
+--------
+可以使用'Influxd'程序调用这些命令。如果跳过命令参数，则默认为“run”。
+
+backup:
+  下载数据节点的快照并将其保存到磁盘。
+
+config:
+  显示默认配置。这还可以读取现有配置文件并输出任何缺少字段的默认值。可以通过环境变量自定义配置文件中的默认值和现有条目。
+
+restore：
+  使用备份还原Metastore，数据库，保留策略或特定分片。在还原期间，不得运行InfluxDB进程。
+
+run：
+  运行InfluxDB服务器。如果未指定，则这是默认命令。
+
+version：
+  显示InfluxDB版本，构建分支和git commit hash。

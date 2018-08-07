@@ -38,3 +38,45 @@ OPTIONS
   Customize the default configuration file to load. Disables automatic loading when the path is */dev/null*.
 
 include::footer.txt[]
+
+
+
+
+influxd-配置（1）
+=================
+
+名称
+----
+Influxd-config - 为InfluxDB生成配置文件
+
+概要
+--------
+[诗]
+'Influxd'config（-config <path>）
+'Influxd config'-config / dev / null
+
+描述
+-----------
+'Influxd config'将为InfluxDB生成一个配置文件。配置文件将输出到标准输出，并可以通过将shell输出重定向到另一个文件来写入文件。
+
+使用“-config <path>”指定配置文件时，将读取此配置文件，并将覆盖任何存在的值的默认值。它可用于提供仅包含要自定义选项的配置片段，并从该文件生成新配置文件。如果未指定“-config <path>”，则该命令将使用与* Influxd-run *（1）相同的方法查找默认配置文件。
+
+使用此命令重新生成配置文件时，请确保使用临时文件作为输出。此命令不起作用：
+
+===
+＃ 不使用！
+$ influxd config -config Influxdb.conf> Influxdb.conf
+
+＃正确的方法！
+$ influxd config -config Influxdb.conf> Influxdb.conf.tmp && \
+      mv Influxdb.conf.tmp Influxdb.conf
+===
+
+在'influxd config'可以读取它之前，shell将截断配置文件，您将丢失所有自定义选项。为安全起见，请将输出重定向到临时文件，然后使用“mv”移动文件。
+
+第二个命令版本将强制'Influxd config'输出默认配置文件。将配置文件设置为* / dev / null *将导致该命令仅输出默认值，并且不会读取任何现有配置文件中的任何值。
+
+OPTIONS
+-------
+-config <path> ::
+  自定义要加载的默认配置文件。当路径为* / dev / null *时禁用自动加载。

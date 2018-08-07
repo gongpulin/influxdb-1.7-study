@@ -50,3 +50,56 @@ OPTIONS
   Use version 2 of the stress tool. The default is to use version 1.
 
 include::footer.txt[]
+
+
+
+
+influx_stress（1）
+================
+
+名称
+----
+Influx_stress - 针对一个或多个InfluxDB服务器运行压力测试
+
+概要
+--------
+'Influx_stress'[选项]
+
+描述
+-----------
+运行针对一个或多个InfluxDB服务器的写入和查询压力测试
+针对InfluxDB创建可重现的性能基准。
+
+OPTIONS
+-------
+-addr <addr> ::
+  响应时间将持续存在的数据库的IP地址和端口。这个
+  不是用于指定要测试的数据库。该选项位于
+  在配置文件中。默认值为“http：// localhost：8086”。
+
+-database <name> ::
+  响应时间将持续存在的数据库。这不是用于指定
+  要测试哪个数据库。请参阅'-db'或配置文件
+  选项。默认为'stress'。
+
+-retention-policy <name> ::
+  保留策略，响应时间将持续存在。这不适合
+  指定要测试的保留策略。请参阅配置文件
+  对于那个选择。默认值为空字符串，将使用默认值
+  保留政策。
+
+-config <path> ::
+  压力配置文件。
+
+-cpuprofile <path> ::
+  将cpu配置文件写入路径。除非是这样，否则不会写入cpu配置文件
+  用过的。这个配置文件'Influx_stress'，而不是InfluxDB服务器。
+
+-db <name> ::
+  测试系统中的目标数据库用于写入和查询加载。
+
+-tags <values> ::
+  逗号分隔的标签列表。
+
+-V2 ::
+  使用压力工具的第2版。默认设置是使用版本1。

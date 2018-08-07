@@ -30,3 +30,36 @@ OPTIONS
   Write memory usage information to a file.
 
 include::footer.txt[]
+
+
+
+influxd运行（1）
+==============
+
+名称
+----
+Influxd-run - 配置并启动InfluxDB服务器
+
+概要
+--------
+[诗]
+'Influxd'[ - config <path>] [-pidfile <path>] [-cpuprofile <path>] [-memprofile <path>]
+'Influxd run'[ - config <path>] [-pidfile <path>] [-cpuprofile <path>] [-memprofile <path>]
+
+描述
+-----------
+运行InfluxDB服务器。
+
+OPTIONS
+-------
+-config <path> ::
+   设置配置文件的路径。 如果任何这些位置存在文件，则默认为环境变量* INFLUXDB_CONFIG_PATH *，*〜/ .influxdb / Influxdb.conf *或* / etc / Influxdb / Influxdb.conf *。 使用空设备作为路径禁用自动加载配置文件（例如Linux或Mac OS X上的/ dev / null）。
+
+-pidfile <path> ::
+   将进程ID写入文件。
+
+-cpuprofile <path> ::
+   将CPU分析信息写入文件。
+
+-memprofile <path> ::
+   将内存使用信息写入文件。

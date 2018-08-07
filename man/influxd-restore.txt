@@ -56,3 +56,60 @@ SEE ALSO
 *influxd-backup*(1)
 
 include::footer.txt[]
+
+
+
+
+
+influxd还原（1）
+==================
+
+名称
+----
+Influxd-restore - 将数据库或特定分片还原到InfluxDB OSS实例
+  来自指定的PATH。完整的文档
+  对于此处描述的'-portable'还原方法，以及不推荐使用的旧式还原格式，
+  位于这里：
+    https://docs.influxdata.com/influxdb/latest/administration/backup_and_restore/
+
+
+概要
+--------
+'Influxd-restore' - 便携式[选项]路径
+
+描述
+-----------
+使用指定PATH中的备份副本从InfluxDB OSS还原数据库或特定分片
+  或InfluxDB Enterprise到InfluxDB OSS实例。
+
+OPTIONS
+-------
+
+注意：使用“-portable”选项进行还原会使用改进的Enterprise兼容的文件
+  包含文件清单的格式。
+
+- portable::
+  需要激活便携式还原模式。如果未指定，则使用传统还原模式。
+
+-host <host：port> ::
+  InfluxDB OSS主机连接到要恢复数据的位置。默认为“127.0.0.1:8088”。
+
+-db <db_name> ::
+  要从备份还原的数据库的名称（InfluxDB OSS或InfluxDB Enterprise）
+
+-newdb <newdb_name> ::
+  将在目标系统上导入存档数据的InfluxDB OSS数据库的名称。可选的。
+   如果未给出，则使用'-db <db_name>'的值。新数据库名称必须对目标系统是唯一的。
+
+-rp <rp_name> ::
+  要还原的备份的保留策略的名称。可选的。需要指定'-db <db_name>'。
+
+-newrp <newrp_name> ::
+  要在目标系统上创建的保留策略的名称。可选的。需要设置'-rp <rp_name>'。
+  如果未给出，则使用'-rp <rp_name>'值。
+
+-shard <shard_id> ::
+  要还原的分片的标识符。可选的。如果指定，则需要'-db <db_name>'和'-rp <rp_name>'。
+
+PATH
+  包含备份文件的目录的路径。

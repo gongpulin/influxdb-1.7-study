@@ -166,6 +166,7 @@ func (s *Store) Path() string { return s.path }
 
 // Open initializes the store, creating all necessary directories, loading all
 // shards as well as initializing periodic maintenance of them.
+//Open初始化Store，创建所有必需的目录，加载所有分片以及初始化它们的定期维护。
 func (s *Store) Open() error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
@@ -866,6 +867,7 @@ func byDatabase(name string) func(sh *Shard) bool {
 // walkShards apply a function to each shard in parallel. fn must be safe for
 // concurrent use. If any of the functions return an error, the first error is
 // returned.
+//walkShards并行地为每个分片应用一个函数。 fn必须安全并发使用。 如果任何函数返回错误，则返回第一个错误。
 func (s *Store) walkShards(shards []*Shard, fn func(sh *Shard) error) error {
 	// struct to hold the result of opening each reader in a goroutine
 	type res struct {
@@ -957,6 +959,7 @@ func (s *Store) DiskSize() (int64, error) {
 
 // sketchesForDatabase returns merged sketches for the provided database, by
 // walking each shard in the database and merging the sketches found there.
+//sketchesForDatabase通过遍历数据库中的每个分片并合并在那里找到的草图来返回所提供数据库的合并草图。
 func (s *Store) sketchesForDatabase(dbName string, getSketches func(*Shard) (estimator.Sketch, estimator.Sketch, error)) (estimator.Sketch, estimator.Sketch, error) {
 	var (
 		ss estimator.Sketch // Sketch estimating number of items.
@@ -993,10 +996,11 @@ func (s *Store) sketchesForDatabase(dbName string, getSketches func(*Shard) (est
 
 // SeriesCardinality returns the exact series cardinality for the provided
 // database.
-//
+//SeriesCardinality返回所提供数据库的确切系列基数。
+
 // Cardinality is calculated exactly by unioning all shards' bitsets of series
 // IDs. The result of this method cannot be combined with any other results.
-//
+//基数通过联合系列ID的所有分片的位集来精确计算。 此方法的结果不能与任何其他结果组合。
 func (s *Store) SeriesCardinality(database string) (int64, error) {
 	s.mu.RLock()
 	shards := s.filterShards(byDatabase(database))

@@ -876,6 +876,7 @@ func (e *Engine) LoadMetadataIndex(shardID uint64, index tsdb.Index) error {
 
 // IsIdle returns true if the cache is empty, there are no running compactions and the
 // shard is fully compacted.
+//如果缓存为空，则没有正在运行的压缩并且碎片已完全压缩，则IsIdle返回true。
 func (e *Engine) IsIdle() bool {
 	cacheEmpty := e.Cache.Size() == 0
 

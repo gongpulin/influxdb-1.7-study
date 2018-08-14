@@ -1825,6 +1825,7 @@ func (p *point) unmarshalBinary() (Fields, error) {
 }
 
 // HashID returns a non-cryptographic checksum of the point's key.
+//HashID返回点密钥的非加密校验和。
 func (p *point) HashID() uint64 {
 	h := NewInlineFNV64a()
 	h.Write(p.key)

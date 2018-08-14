@@ -94,10 +94,17 @@ func NewPointsWriter() *PointsWriter {
 }
 
 // ShardMapping contains a mapping of shards to points.
+// ShardMapping包含shards到点的映射。
 type ShardMapping struct {
 	n       int
-	Points  map[uint64][]models.Point  // The points associated with a shard ID
+
+	//ID与分片ID关联的点
+	Points  map[uint64][]models.Point  // The points associated with a shard
+
+	//已映射的分片，由分片ID键入
 	Shards  map[uint64]*meta.ShardInfo // The shards that have been mapped, keyed by shard ID
+
+	//丢弃的points
 	Dropped []models.Point             // Points that were dropped
 }
 
@@ -111,6 +118,7 @@ func NewShardMapping(n int) *ShardMapping {
 }
 
 // MapPoint adds the point to the ShardMapping, associated with the given shardInfo.
+//MapPoint将该点添加到与给定的shardInfo关联的ShardMapping。
 func (s *ShardMapping) MapPoint(shardInfo *meta.ShardInfo, p models.Point) {
 	if cap(s.Points[shardInfo.ID]) < s.n {
 		s.Points[shardInfo.ID] = make([]models.Point, 0, s.n)
@@ -120,6 +128,7 @@ func (s *ShardMapping) MapPoint(shardInfo *meta.ShardInfo, p models.Point) {
 }
 
 // Open opens the communication channel with the point writer.
+//Open方法打开与point writer的通信channel。
 func (w *PointsWriter) Open() error {
 	w.mu.Lock()
 	defer w.mu.Unlock()
@@ -187,6 +196,7 @@ func (w *PointsWriter) Statistics(tags map[string]string) []models.Statistic {
 // MapShards maps the points contained in wp to a ShardMapping.  If a point
 // maps to a shard group or shard that does not currently exist, it will be
 // created before returning the mapping.
+//MapShards将WritePointsRequest中包含的点映射到ShardMapping。 如果某个点映射到当前不存在的分片组或分片，则会在返回映射之前创建该分片组或分片。
 func (w *PointsWriter) MapShards(wp *WritePointsRequest) (*ShardMapping, error) {
 	rp, err := w.MetaClient.RetentionPolicy(wp.Database, wp.RetentionPolicy)
 	if err != nil {
@@ -196,6 +206,7 @@ func (w *PointsWriter) MapShards(wp *WritePointsRequest) (*ShardMapping, error) 
 	}
 
 	// Holds all the shard groups and shards that are required for writes.
+	//保存写入所需的所有分片组和分片。
 	list := make(sgList, 0, 8)
 	min := time.Unix(0, models.MinNanoTime)
 	if rp.Duration > 0 {
@@ -205,12 +216,14 @@ func (w *PointsWriter) MapShards(wp *WritePointsRequest) (*ShardMapping, error) 
 	for _, p := range wp.Points {
 		// Either the point is outside the scope of the RP, or we already have
 		// a suitable shard group for the point.
+		//要点不在RP的范围内，要么我们已经为该点设置了合适的分片组。
 		if p.Time().Before(min) || list.Covers(p.Time()) {
 			continue
 		}
 
 		// No shard groups overlap with the point's time, so we will create
 		// a new shard group for this point.
+		//没有分片组与点的时间重叠，因此我们将为此点创建一个新的分片组。
 		sg, err := w.MetaClient.CreateShardGroup(wp.Database, wp.RetentionPolicy, p.Time())
 		if err != nil {
 			return nil, err
@@ -228,6 +241,7 @@ func (w *PointsWriter) MapShards(wp *WritePointsRequest) (*ShardMapping, error) 
 		if sg == nil {
 			// We didn't create a shard group because the point was outside the
 			// scope of the RP.
+			//我们没有创建分片组，因为该分数超出了RP的范围。
 			mapping.Dropped = append(mapping.Dropped, p)
 			atomic.AddInt64(&w.stats.WriteDropped, 1)
 			continue
@@ -241,6 +255,7 @@ func (w *PointsWriter) MapShards(wp *WritePointsRequest) (*ShardMapping, error) 
 
 // sgList is a wrapper around a meta.ShardGroupInfos where we can also check
 // if a given time is covered by any of the shard groups in the list.
+//sgList是meta.ShardGroupInfos的包装器，我们还可以检查列表中的任何分片组是否覆盖给定时间。
 type sgList meta.ShardGroupInfos
 
 func (l sgList) Covers(t time.Time) bool {
@@ -252,17 +267,22 @@ func (l sgList) Covers(t time.Time) bool {
 
 // ShardGroupAt attempts to find a shard group that could contain a point
 // at the given time.
-//
+//ShardGroupAt尝试查找可在给定时间包含点的分片组。
+
 // Shard groups are sorted first according to end time, and then according
 // to start time. Therefore, if there are multiple shard groups that match
 // this point's time they will be preferred in this order:
 //
 //  - a shard group with the earliest end time;
 //  - (assuming identical end times) the shard group with the earliest start time.
+//分片组首先根据结束时间排序，然后根据开始时间排序。 因此，如果有多个与此点时间匹配的分片组，则按此顺序首选它们：
+//   - 最早结束时间的shard group;
+//   - （假设结束时间相同）具有最早开始时间的分片组。
 func (l sgList) ShardGroupAt(t time.Time) *meta.ShardGroupInfo {
 	idx := sort.Search(len(l), func(i int) bool { return l[i].EndTime.After(t) })
 
 	// We couldn't find a shard group the point falls into.
+	//我们找不到这个点落入的shard group。
 	if idx == len(l) || t.Before(l[idx].StartTime) {
 		return nil
 	}
@@ -270,6 +290,7 @@ func (l sgList) ShardGroupAt(t time.Time) *meta.ShardGroupInfo {
 }
 
 // Append appends a shard group to the list, and returns a sorted list.
+//Append将分片组附加到列表中，并返回已排序的列表。
 func (l sgList) Append(sgi meta.ShardGroupInfo) sgList {
 	next := append(l, sgi)
 	sort.Sort(meta.ShardGroupInfos(next))
@@ -278,11 +299,13 @@ func (l sgList) Append(sgi meta.ShardGroupInfo) sgList {
 
 // WritePointsInto is a copy of WritePoints that uses a tsdb structure instead of
 // a cluster structure for information. This is to avoid a circular dependency.
+//WritePointsInto是WritePoints的副本，它使用tsdb结构而不是集群结构来获取信息。 这是为了避免循环依赖。
 func (w *PointsWriter) WritePointsInto(p *IntoWriteRequest) error {
 	return w.WritePointsPrivileged(p.Database, p.RetentionPolicy, models.ConsistencyLevelOne, p.Points)
 }
 
 // WritePoints writes the data to the underlying storage. consitencyLevel and user are only used for clustered scenarios
+//WritePoints将数据写入底层存储。 consitencyLevel和user仅用于集群方案
 func (w *PointsWriter) WritePoints(database, retentionPolicy string, consistencyLevel models.ConsistencyLevel, user meta.User, points []models.Point) error {
 	return w.WritePointsPrivileged(database, retentionPolicy, consistencyLevel, points)
 }
@@ -300,12 +323,14 @@ func (w *PointsWriter) WritePointsPrivileged(database, retentionPolicy string, c
 		retentionPolicy = db.DefaultRetentionPolicy
 	}
 
+    //将要写入的Points按时间划分到要写入的shard,返回points和shard之间的映射关系
 	shardMappings, err := w.MapShards(&WritePointsRequest{Database: database, RetentionPolicy: retentionPolicy, Points: points})
 	if err != nil {
 		return err
 	}
 
 	// Write each shard in it's own goroutine and return as soon as one fails.
+	//每一个 shard 都有一个独立的协程负责写入，只要有一个出错，就立即返回错误信息
 	ch := make(chan error, len(shardMappings.Points))
 	for shardID, points := range shardMappings.Points {
 		go func(shard *meta.ShardInfo, database, retentionPolicy string, points []models.Point) {

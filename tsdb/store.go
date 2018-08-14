@@ -1269,6 +1269,7 @@ func (s *Store) WriteToShard(shardID uint64, points []models.Point) error {
 
 	// Ensure snapshot compactions are enabled since the shard might have been cold
 	// and disabled by the monitor.
+	//确保已启用快照压缩，因为分片可能已冷并且已被监视器禁用。
 	if sh.IsIdle() {
 		sh.SetCompactionsEnabled(true)
 	}
@@ -1279,6 +1280,7 @@ func (s *Store) WriteToShard(shardID uint64, points []models.Point) error {
 // MeasurementNames returns a slice of all measurements. Measurements accepts an
 // optional condition expression. If cond is nil, then all measurements for the
 // database will be returned.
+//MeasurementNames返回所有测量的切片。 Measurement接受可选的条件表达式。 如果cond为nil，则返回数据库的所有Measurement。
 func (s *Store) MeasurementNames(auth query.Authorizer, database string, cond influxql.Expr) ([][]byte, error) {
 	s.mu.RLock()
 	shards := s.filterShards(byDatabase(database))
